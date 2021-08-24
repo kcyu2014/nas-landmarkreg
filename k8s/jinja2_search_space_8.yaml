@@ -1,0 +1,93 @@
+#
+
+#{ "policy": 'enas', 'seed_start': 1268, "seed_end": 1270 },
+#{ "policy": 'enas', 'seed_start': 1268, "seed_end": 1270 },
+#{ "policy": 'enas', 'seed_start': 1270, "seed_end": 1272 },
+#{ "policy": 'enas', 'seed_start': 1268, "seed_end": 1270 },
+#  { "policy": 'enas', 'seed_start': 1272, "seed_end": 1274 },
+#  { "policy": 'enas', 'seed_start': 1274, "seed_end": 1276 },
+#  { "policy": 'enas', 'seed_start': 1276, "seed_end": 1278 },
+{%- set params = [
+ "policy": 'enas', 'seed_start': 1271, "seed_end": 1272 },
+  { "policy": 'enas', 'seed_start': 1273, "seed_end": 1274 },
+  { "policy": 'enas', 'seed_start': 1277, "seed_end": 1278 },
+  { "policy": 'darts', 'seed_start': 1275, "seed_end": 1276 },
+  { "policy": 'random', 'seed_start': 1277, "seed_end": 1278},
+]
+%}
+{%- for p in params %}
+{%- set policy = p["policy"] %}
+{%- set seed_start = p["seed_start"] %}
+{%- set seed_end = p["seed_end"] %}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-{{ policy }}-seed-{{ seed_start }}--{{ seed_end }}
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+#  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+#        command: ["python3.6",
+#                  "search_main.py",
+#                  "--epochs=1",
+#                  "--num_intermediate_nodes=8",
+#                  "--evaluation_seed=1278",
+#                  "--search_policy={{ policy }}",
+#                  "--test_dir=V100-experiments/debug/{{ policy }}/search_space_n8/",
+#                  "--gpu=0",
+#                  "--concat=8",
+#                  "--w_inertia=0.5",
+#                  "--c_local=1",
+#                  "--seed_range_start={{ seed_start }}",
+#                  "--seed_range_end={{ seed_end }}",
+#        ]
+        command:
+          ['bash', '{{ policy }}_policy/bash_tests/{{ policy }}_search_space_8.sh',
+           '{{ seed_start }}', '{{ seed_end }}',
+          'V100-experiments/{{ policy }}/search_space_n8/', '1000']
+        workingDir: /home/kyu/.pycharm/search-space-framework
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/.pycharm/search_space_framework
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+      volumes:
+#      - name: mlo-scratch
+#        persistentVolumeClaim:
+#          claimName: mlo-scratch
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+---
+{%- endfor %}
+
+
+

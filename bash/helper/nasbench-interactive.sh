@@ -1,0 +1,1 @@
+bash bash/helper/kubernetes_interactive.sh kyu-nasbench-long 1 none k8s/cifar.yaml

@@ -1,0 +1,1 @@
+bash bash/helper/kubernetes_interactive.sh kyu-imagenet-debug 2 none k8s/imagenet.yaml

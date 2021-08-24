@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: iccluster135-kyu-automl-deployment-1random
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+#  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+#        command:
+#          ['bash', 'bash_forced/soft-weight-mapping/06-12-init-test.sh',
+#           'map_random_v1', '1268', '1269',
+#           'experiments/soft-weight-sharing/soft-mapping-map_random_v1/']
+        command: ['sleep', 'infinity' ]
+        workingDir: /home/kyu/pycharm/automl
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/pycharm/automl:/home/kyu/pycharm/nasbench
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+      volumes:
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi

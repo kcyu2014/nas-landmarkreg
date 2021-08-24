@@ -1,0 +1,6 @@
+setup.py
+ksubmit.egg-info/PKG-INFO
+ksubmit.egg-info/SOURCES.txt
+ksubmit.egg-info/dependency_links.txt
+ksubmit.egg-info/entry_points.txt
+ksubmit.egg-info/top_level.txt

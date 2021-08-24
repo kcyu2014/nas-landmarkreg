@@ -1,0 +1,73 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-job
+  labels:
+    user: kyu
+    priority: "1"
+spec:
+  # activeDeadlineSeconds: 345600 # 4-days
+  template:
+    metadata:
+      labels:
+        user: kyu
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      # nodeSelector:
+        # hardware-type: CPUONLY
+        # cuda-version: '10.2'
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/cvlab-k8s-master/automl-pytorch1.5:cuda10.0
+        command: ['sleep', 'infinity']
+        workingDir: /home/kyu/pycharm/automl
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/pycharm/automl:/home/kyu/pycharm/nasbench
+        resources:
+          requests:
+            cpu: "16"
+            memory: 64Gi            
+          limits:
+            nvidia.com/gpu: "1"
+            cpu: "16"
+            memory: 64Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+        - mountPath: /cvlabsrc1
+          name: cvlabsrc1
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: /data
+          name: imagenet
+        # - mountPath: /scratch
+        #   name: scratch
+      volumes:
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: cvlabsrc1
+        persistentVolumeClaim:
+          claimName: pv-cvlabsrc1-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 32Gi
+      # - name: scratch
+      #   persistentVolumeClaim:
+      #     claimName: cvlab-scratch
+      - name: imagenet
+        emptyDir:
+          sizeLimit: 150Gi

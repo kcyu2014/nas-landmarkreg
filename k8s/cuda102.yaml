@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-job
+  labels:
+    user: kyu
+    priority: "1"
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+  template:
+    metadata:
+      labels:
+        user: kyu
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      nodeSelector:
+        cuda-version: '11.0'
+      containers:
+      - name: pytorch-automl-framework
+        image: pytorch/pytorch:latest
+        # image: ic-registry.epfl.ch/cvlab-k8s-master/automl-pytorch1.5:cuda10.0
+        command: ['sleep', 'infinity']
+        workingDir: /home/kyu/pycharm/automl
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        resources:
+          requests:
+            cpu: "48"
+            memory: 128Gi            
+          limits:
+            nvidia.com/gpu: "1"
+            cpu: "48"
+            memory: 128Gi

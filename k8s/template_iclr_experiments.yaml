@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-job
+  labels:
+    user: kyu
+    priority: "1"
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+  template:
+    metadata:
+      labels:
+        user: kyu
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/cvlab-k8s-master/automl-pytorch1.2:cuda10.0
+        command: ['sleep', 'infinity']
+        workingDir: /home/kyu/pycharm/automl
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/pycharm/automl:/home/kyu/pycharm/nasbench
+        resources:
+          limits:
+            cpu: "5"
+            memory: "10Gi"
+            nvidia.com/gpu: 1 # requests one GPU
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+        - mountPath: /dev/shm
+          name: dshm
+      volumes:
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi

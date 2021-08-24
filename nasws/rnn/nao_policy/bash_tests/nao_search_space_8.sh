@@ -1,0 +1,17 @@
+python3.6 search_main.py --epochs=$4 \
+                                       --num_intermediate_nodes=8 \
+                                       --search_policy=nao \
+                                       --gpu=0 \
+                                       --concat=8 \
+                                       --top_archs=100 \
+                                       --random_new_archs=50 \
+                                       --max_new_archs=300 \
+                                       --controller_num_seed_arch=1000 \
+                                       --controller_train_epochs=1000 \
+                                       --child_eval_every_epochs=200 \
+                                       --controller_batch_size=100 \
+                                       --evaluation_seed=1278 \
+                                       --seed_range_start=$1 \
+                                       --seed_range_end=$2 \
+                                       --test_dir=$3 \
+                                       --handle_hidden_mode=RELOAD

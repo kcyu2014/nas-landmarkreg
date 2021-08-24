@@ -1,0 +1,280 @@
+#
+
+#{ "policy": 'enas', 'seed_start': 1268, "seed_end": 1270 },
+#{ "policy": 'enas', 'seed_start': 1268, "seed_end": 1270 },
+#{ "policy": 'enas', 'seed_start': 1270, "seed_end": 1272 },
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-enas-seed-1268--1270
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+#  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+#        command: ["python3.6",
+#                  "search_main.py",
+#                  "--epochs=1",
+#                  "--num_intermediate_nodes=8",
+#                  "--evaluation_seed=1278",
+#                  "--search_policy=enas",
+#                  "--test_dir=V100-experiments/debug/enas/search_space_n8/",
+#                  "--gpu=0",
+#                  "--concat=8",
+#                  "--w_inertia=0.5",
+#                  "--c_local=1",
+#                  "--seed_range_start=1268",
+#                  "--seed_range_end=1270",
+#        ]
+        command:
+          ['bash', 'enas_policy/bash_tests/enas_search_space_8.sh',
+           '1268', '1270',
+          'V100-experiments/enas/search_space_n8/', '1000']
+        workingDir: /home/kyu/.pycharm/search-space-framework
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/.pycharm/search_space_framework
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+      volumes:
+#      - name: mlo-scratch
+#        persistentVolumeClaim:
+#          claimName: mlo-scratch
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+---
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-enas-seed-1272--1274
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+#  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+#        command: ["python3.6",
+#                  "search_main.py",
+#                  "--epochs=1",
+#                  "--num_intermediate_nodes=8",
+#                  "--evaluation_seed=1278",
+#                  "--search_policy=enas",
+#                  "--test_dir=V100-experiments/debug/enas/search_space_n8/",
+#                  "--gpu=0",
+#                  "--concat=8",
+#                  "--w_inertia=0.5",
+#                  "--c_local=1",
+#                  "--seed_range_start=1272",
+#                  "--seed_range_end=1274",
+#        ]
+        command:
+          ['bash', 'enas_policy/bash_tests/enas_search_space_8.sh',
+           '1272', '1274',
+          'V100-experiments/enas/search_space_n8/', '1000']
+        workingDir: /home/kyu/.pycharm/search-space-framework
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/.pycharm/search_space_framework
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+      volumes:
+#      - name: mlo-scratch
+#        persistentVolumeClaim:
+#          claimName: mlo-scratch
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+---
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-enas-seed-1274--1276
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+#  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+#        command: ["python3.6",
+#                  "search_main.py",
+#                  "--epochs=1",
+#                  "--num_intermediate_nodes=8",
+#                  "--evaluation_seed=1278",
+#                  "--search_policy=enas",
+#                  "--test_dir=V100-experiments/debug/enas/search_space_n8/",
+#                  "--gpu=0",
+#                  "--concat=8",
+#                  "--w_inertia=0.5",
+#                  "--c_local=1",
+#                  "--seed_range_start=1274",
+#                  "--seed_range_end=1276",
+#        ]
+        command:
+          ['bash', 'enas_policy/bash_tests/enas_search_space_8.sh',
+           '1274', '1276',
+          'V100-experiments/enas/search_space_n8/', '1000']
+        workingDir: /home/kyu/.pycharm/search-space-framework
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/.pycharm/search_space_framework
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+      volumes:
+#      - name: mlo-scratch
+#        persistentVolumeClaim:
+#          claimName: mlo-scratch
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+---
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-enas-seed-1276--1278
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+#  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+#        command: ["python3.6",
+#                  "search_main.py",
+#                  "--epochs=1",
+#                  "--num_intermediate_nodes=8",
+#                  "--evaluation_seed=1278",
+#                  "--search_policy=enas",
+#                  "--test_dir=V100-experiments/debug/enas/search_space_n8/",
+#                  "--gpu=0",
+#                  "--concat=8",
+#                  "--w_inertia=0.5",
+#                  "--c_local=1",
+#                  "--seed_range_start=1276",
+#                  "--seed_range_end=1278",
+#        ]
+        command:
+          ['bash', 'enas_policy/bash_tests/enas_search_space_8.sh',
+           '1276', '1278',
+          'V100-experiments/enas/search_space_n8/', '1000']
+        workingDir: /home/kyu/.pycharm/search-space-framework
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/.pycharm/search_space_framework
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+      volumes:
+#      - name: mlo-scratch
+#        persistentVolumeClaim:
+#          claimName: mlo-scratch
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+---
+
+
+

@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kyu-automl-darts-eval-seed-1267-newfix-continue
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+#        command: ["python3.6",
+#                  "search_main.py",
+#                  "--epochs=1000",
+#                  "--num_intermediate_nodes=8",
+#                  "--forced_genotype=",
+#                  "--evaluation_seed=1629",
+#                  "--search_policy=random",
+#                  "--test_dir=experiments_random/search_space_n2/without/r1629",
+#                  "--gpu=0",
+#                  "--concat=2",
+#                  "--w_inertia=0.5",
+#                  "--c_local=1",
+#        ]
+        command: [
+                   'bash',
+                   'darts_policy/bash_tests/reproduce_darts_continue-k8s.sh'
+#                   'darts_policy/bash_tests/reproduce_darts.sh'
+#                   'sleep','infinity'
+        ]
+        workingDir: /home/kyu/.pycharm/search-space-framework
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/.pycharm/search_space_framework
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+      volumes:
+#      - name: mlo-scratch
+#        persistentVolumeClaim:
+#          claimName: mlo-scratch
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+---

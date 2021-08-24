@@ -1,0 +1,9 @@
+python3.6 search_main.py --epochs=4000 \
+                          --num_intermediate_nodes=8 \
+                          --concat=8 \
+                          --search_policy=darts \
+                          --forced_genotype_by_name=DARTS \
+                          --test_dir=darts_policy/tests_dir \
+                          --seed_range_start=3 \
+                          --seed_range_end=4 \
+                          --handle_hidden_mode=RELOAD

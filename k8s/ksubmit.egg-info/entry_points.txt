@@ -1,0 +1,3 @@
+[console_scripts]
+ksubmit = submit_kbs_jobs:run
+

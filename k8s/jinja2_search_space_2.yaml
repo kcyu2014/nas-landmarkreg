@@ -1,0 +1,106 @@
+{%- set params = [
+{ "forced_genotype": 1},
+{ "forced_genotype": 3},
+{ "forced_genotype": 5},
+{ "forced_genotype": 6},
+{ "forced_genotype": 7},
+{ "forced_genotype": 8},
+{ "forced_genotype": 13},
+{ "forced_genotype": 15},
+{ "forced_genotype": 16},
+{ "forced_genotype": 20},
+{ "forced_genotype": 21},
+{ "forced_genotype": 23},
+{ "forced_genotype": 24},
+{ "forced_genotype": 26},
+{ "forced_genotype": 29},
+{ "forced_genotype": 30},
+]
+%}
+{%- for p in params %}
+{%- set forced_genotype = p["forced_genotype"] %}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sciuto-automl-random2-gen{{ forced_genotype }}-seed-1629
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+#  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+        command: ["python3.6",
+                  "search_main.py",
+                  "--epochs=1000",
+                  "--num_intermediate_nodes=2",
+                  "--forced_genotype={{ forced_genotype }}",
+                  "--evaluation_seed=1629",
+                  "--search_policy=random",
+                  "--test_dir=experiments_random/search_space_n2/without/r1629",
+                  "--gpu=0",
+                  "--concat=2",
+                  "--w_inertia=0.5",
+                  "--c_local=1",
+                  "--seed_range_start=1637",
+                  "--seed_range_end=1638",
+        ]
+        workingDir: /scratch/csciuto/darts_PSO/search_space_framework
+        env:
+        - name: ROLE
+          value: worker
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /scratch
+          name: mlo-scratch
+      volumes:
+      - name: mlo-scratch
+        persistentVolumeClaim:
+          claimName: mlo-scratch
+---
+{%- endfor %}
+#
+#{ "forced_genotype": 0},
+#{ "forced_genotype": 1},
+#{ "forced_genotype": 2},
+#{ "forced_genotype": 3},
+#{ "forced_genotype": 4},
+#{ "forced_genotype": 5},
+#{ "forced_genotype": 6},
+#{ "forced_genotype": 7},
+#{ "forced_genotype": 8},
+#{ "forced_genotype": 9},
+#{ "forced_genotype": 10},
+#{ "forced_genotype": 11},
+#{ "forced_genotype": 12},
+#{ "forced_genotype": 13},
+#{ "forced_genotype": 14},
+#{ "forced_genotype": 15},
+#{ "forced_genotype": 16},
+#{ "forced_genotype": 17},
+#{ "forced_genotype": 18},
+#{ "forced_genotype": 19},
+#{ "forced_genotype": 20},
+#{ "forced_genotype": 21},
+#{ "forced_genotype": 22},
+#{ "forced_genotype": 23},
+#{ "forced_genotype": 24},
+#{ "forced_genotype": 25},
+#{ "forced_genotype": 26},
+#{ "forced_genotype": 27},
+#{ "forced_genotype": 29},
+#{ "forced_genotype": 30},
+#{ "forced_genotype": 31}
+Collapse
+
+
+

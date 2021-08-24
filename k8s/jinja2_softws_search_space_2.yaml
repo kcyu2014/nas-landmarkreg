@@ -1,0 +1,77 @@
+
+{%- set params = [
+  { "map_fn": 'map_v1', 'seed_start': 1268, "seed_end": 1269, "alias": "map-v1" },
+  { "map_fn": 'map_v1', 'seed_start': 1269, "seed_end": 1270, "alias": "map-v1" },
+  { "map_fn": 'map_v1', 'seed_start': 1270, "seed_end": 1271, "alias": "map-v1" },
+  { "map_fn": 'map_v2', 'seed_start': 1268, "seed_end": 1269, "alias": "map-v2"  },
+  { "map_fn": 'map_v2', 'seed_start': 1269, "seed_end": 1270, "alias": "map-v2"  },
+  { "map_fn": 'map_v2', 'seed_start': 1270, "seed_end": 1271, "alias": "map-v2"  },
+  { "map_fn": 'map_random_v1', 'seed_start': 1268, "seed_end": 1269, "alias": "map-random-v1" },
+  { "map_fn": 'map_random_v1', 'seed_start': 1269, "seed_end": 1270, "alias": "map-random-v1"  },
+  { "map_fn": 'map_random_v1', 'seed_start': 1270, "seed_end": 1271, "alias": "map-random-v1"  },
+
+]
+%}
+{%- for p in params %}
+{%- set map_fn = p["map_fn"] %}
+{%- set alias = p["alias"] %}
+{%- set seed_start = p["seed_start"] %}
+{%- set seed_end = p["seed_end"] %}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: iccluster135-kyu-mapfn-{{ alias }}-seed-{{ seed_start }}-{{ seed_end }}
+spec:
+  activeDeadlineSeconds: 345600 # 4-days
+#  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 168151
+        fsGroup: 11166
+      containers:
+      - name: pytorch-automl-framework
+        image: ic-registry.epfl.ch/mlo/automl_cuda9
+        command:
+          ['bash', 'bash_forced/soft-weight-mapping/06-12-init-test.sh',
+           '{{ map_fn }}', '{{ seed_start }}', '{{ seed_end }}',
+           'experiments/soft-weight-sharing/soft-mapping-{{ map_fn }}/']
+        workingDir: /home/kyu/.pycharm/automl
+        env:
+        - name: ROLE
+          value: worker
+        - name: HOME
+          value: /home/kyu
+        - name: PYTHONPATH
+          value: /home/kyu/.pycharm/automl
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requests one GPU
+            memory: 12Gi
+          requests:
+            memory: 12Gi
+        volumeMounts:
+        # mount the data volumes
+        - mountPath: /home/kyu
+          name: cvlabdata2
+          subPath: home/kyu
+        - mountPath: /cvlabdata2
+          name: cvlabdata2
+      volumes:
+#      - name: mlo-scratch
+#        persistentVolumeClaim:
+#          claimName: mlo-scratch
+      - name: cvlabdata2
+        persistentVolumeClaim:
+          claimName: pv-cvlabdata2-deadline
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+---
+{%- endfor %}
+
+
+
